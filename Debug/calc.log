@@ -1,2 +1,5 @@
 ﻿  main.cpp
-  calc.vcxproj -> C:\Users\82105\source\repos\calc\Debug\calc.exe
+  stack.cpp
+c:\users\82105\source\repos\calc\calc\stack.cpp(49): error C3861: 'NULL': 식별자를 찾을 수 없습니다.
+c:\users\82105\source\repos\calc\calc\stack.cpp(62): error C3861: 'NULL': 식별자를 찾을 수 없습니다.
+  코드를 생성하고 있습니다...
