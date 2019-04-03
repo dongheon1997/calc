@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 
 using namespace std;
 
@@ -65,10 +66,7 @@ void stack<T>::push(T value)
 template <typename T>
 T stack<T>::pop()
 {
-	if (top == 0)
-	{
-		return NULL;
-	}
+	if (top == 0) return NULL;
 
 	if (--top == capacity / 4 && capacity - 8)
 	{
@@ -82,6 +80,7 @@ template <typename T>
 T stack<T>::check() const
 {
 	if (top == 0) return NULL;
+
 	return arr[top - 1];
 }
 
@@ -186,8 +185,14 @@ char *calculate(char *str) // 후위식으로 변경하는 함수
 			{
 				temp = oper.pop();
 				result[num++] = temp;
-				if (temp == NULL) return result;
-				result[num++] = ' ';
+				if (temp == NULL)
+				{
+					return result;
+				}
+				else
+				{
+					result[num++] = ' ';
+				}
 			}
 			break;
 		default:
@@ -199,13 +204,82 @@ char *calculate(char *str) // 후위식으로 변경하는 함수
 	}
 }
 
+double calc(char *str)
+{
+	stack<double> num;
+	double left, right;
+
+	while (*str)
+	{
+		if (*str >= '0' && *str <= '9')
+		{
+			//공백 만날 때까지 숫자 읽고 스텍에 넣기
+
+			num.push(atof(str));
+			do {
+				str += 1;
+			} while (*str >= '0' && *str <= '9');
+		}
+		else if (*str - ' ')
+		{
+			//공백 만날 때까지 읽으면 연산자 or NULL
+			//<연산자>
+			//스텍에서 피연산자 꺼내서 계산하고 (나눗셈은 에러 검사)
+			//결과값 스텍에 넣기
+			right = num.pop();
+			if (*str != '~')
+			{
+				left = num.pop();
+			}
+
+			switch (*str)
+			{
+			case '-':
+				num.push(left - right);
+				break;
+			case '+':
+				num.push(left + right);
+				break;
+			case '*':
+				num.push(left * right);
+				break;
+			case '/':
+				if (right == 0) exit(-1);//에어러러러러러러러러
+				num.push(left / right);
+				break;
+			case '%':
+				if (left - (int)left)
+				{
+					exit(-1);//에어러러러러러러러러
+				}
+				if (right - (int)right)
+				{
+					exit(-1);//에러러러러러러
+				}
+				num.push((int)left % (int)right);
+				break;
+			case '^':
+				num.push(pow(left, right));
+				break;
+			case '~':
+				num.push(right * -1);
+				break;
+			}
+		}
+		str += 1;
+	}
+
+	return num.pop();
+}
+
 int main()
 {
 	char input[256];
 	
 	cin.getline(input, 256);
 
-	cout << calculate(input);
+	cout << "후위식은 " << calculate(input) << endl;
+	cout << "결과값은 " << calc(calculate(input)) << endl;
 
 	return 0;
 }
