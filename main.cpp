@@ -30,7 +30,7 @@ int comingPriority(char oper)
 	}
 }
 
-bool isDigit(char c)
+inline bool isDigit(char c)
 {
 	return (c >= '0' && c <= '9');
 }
@@ -51,8 +51,7 @@ char *infixToPostfix(char *infix)
 		{
 			if (prevInput == 피연산자)
 			{
-				strcpy_s(result, "피연산자가 연속으로 배치될 수 없습니다.");
-				return result;
+				throw "피연산자가 연속으로 배치될 수 없습니다.";
 			}
 
 			do {
@@ -81,11 +80,10 @@ char *infixToPostfix(char *infix)
 		case '^':
 			if (prevInput != 피연산자)
 			{
-				strcpy_s(result, "이항연산자 전에 연산자가 위치할 수 없습니다.");
-				return result;
+				throw "이항연산자 전에 연산자가 위치할 수 없습니다.";
 			}
 
-			while (comingPriority(oper.checkTop()) >= comingPriority(*infix))
+			while (comingPriority(oper.peek()) >= comingPriority(*infix))
 			{
 				result[num++] = oper.pop();
 				result[num++] = ' ';
@@ -97,8 +95,7 @@ char *infixToPostfix(char *infix)
 		case '(':
 			if (prevInput == 피연산자)
 			{
-				strcpy_s(result, "여는 괄호 전에 피연산자가 위치할 수 없습니다.");
-				return result;
+				throw "여는 괄호 전에 피연산자가 위치할 수 없습니다.";
 			}
 
 			oper.push(*infix);
@@ -107,13 +104,11 @@ char *infixToPostfix(char *infix)
 		case ')':
 			if (prevInput != 피연산자)
 			{
-				strcpy_s(result, "닫는 괄호 전에 연산자가 위치할 수 없습니다.");
-				return result;
+				throw "닫는 괄호 전에 연산자가 위치할 수 없습니다.";
 			}
 			else if (braceCount == 0)
 			{
-				strcpy_s(result, "괄호의 짝이 맞지 않습니다.");
-				return result;
+				throw "괄호의 짝이 맞지 않습니다.";
 			}
 
 			while (true)
@@ -128,13 +123,11 @@ char *infixToPostfix(char *infix)
 		case '\0':
 			if (prevInput != 피연산자)
 			{
-				strcpy_s(result, "식이 비었거나 연산자로 끝났습니다.");
-				return result;
+				throw "식이 비었거나 연산자로 끝났습니다.";
 			}
 			else if (braceCount != 0)
 			{
-				strcpy_s(result, "괄호의 짝이 맞지 않습니다.");
-				return result;
+				throw "괄호의 짝이 맞지 않습니다.";
 			}
 
 			while (true)
@@ -146,8 +139,7 @@ char *infixToPostfix(char *infix)
 			}
 			break;
 		default:
-			strcpy_s(result, "식에 알 수 없는 문자가 있습니다.");
-			return result;
+			throw "식에 알 수 없는 문자가 있습니다.";
 		}
 
 		infix += 1;
@@ -192,17 +184,15 @@ double calculate(char *postfix)
 			case '/':
 				if (right == 0)
 				{
-					cout << "[오류] 0으로 나누는 사태가 발생했습니다.";
-					return DBL_MAX;
+					throw "나누기 연산에서 0으로 나누는 사태가 발생했습니다.";
 				}
 
 				num.push(left / right);
 				break;
 			case '%':
-				if (left - (int)left || right - (int)right)
+				if (right == 0)
 				{
-					cout << "[오류] 정수가 아닌 피연산자 간 나머지 연산이 발생했습니다.";
-					return DBL_MAX;
+					throw "나머지 연산에서 0으로 나누는 사태가 발생했습니다.";
 				}
 
 				num.push((int)left % (int)right);
@@ -225,20 +215,35 @@ double calculate(char *postfix)
 int main()
 {
 	char input[256];
+	char *postfix;
 	
-	cin.getline(input, 256);
-
-	char *postfix = infixToPostfix(input);
-
-	if (isDigit(*postfix))
+	while (true)
 	{
-		cout << "후위식은 " << postfix << endl;
+		cout << "계산식을 입력하세요. (종료는 quit) ☞ ";
+		cin.getline(input, 256);
 
-		cout << "결과값은 " << calculate(postfix) << endl;
-	}
-	else
-	{
-		cout << postfix << endl;
+		if (!strcmp(input, "quit")) break;
+
+		try
+		{
+			postfix = infixToPostfix(input);
+			cout << "후위식은 " << postfix << endl;
+		}
+		catch (const char *error)
+		{
+			cout << "[오류] " << error << endl << endl;
+			continue;
+		}
+
+		try
+		{
+			cout << calculate(postfix) << endl << endl;
+		}
+		catch (const char *error)
+		{
+			cout << "[오류] " << error << endl << endl;
+			continue;
+		}
 	}
 
 	return 0;
