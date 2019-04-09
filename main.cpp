@@ -1,4 +1,3 @@
-#include <string>
 #include "Calc.h"
 
 using namespace std;
