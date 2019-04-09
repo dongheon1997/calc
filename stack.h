@@ -1,82 +1,88 @@
 #pragma once
 
 template <typename T>
-class stack
+class Stack
 {
 private:
 	int top;
 	int capacity;
-	T *arr;
+	T *data;
 
 public:
-	stack();
-	~stack();
+	Stack();
+	~Stack();
 	void resize(bool b);
-	void push(T value);
+	void push(T t);
 	T pop();
 	T peek() const;
+	bool isEmpty() const;
 };
 
 template <typename T>
-stack<T>::stack()
+Stack<T>::Stack()
 {
-	top = 0;
+	top = -1;
 	capacity = 8;
-	arr = new T[capacity];
+	data = new T[capacity];
 }
 
 template <typename T>
-stack<T>::~stack()
+Stack<T>::~Stack()
 {
-	delete[] arr;
+	delete[] data;
 }
 
 template <typename T>
-void stack<T>::resize(bool b)
+void Stack<T>::resize(bool b)
 {
-	if (b) capacity *= 2;
-	else capacity /= 2;
+	b ? capacity *= 2 : capacity /= 2;
 
 	T *temp = new T[capacity];
 
-	for (int i = 0; i < top; i += 1)
+	for (int i = 0; i <= top; i += 1)
 	{
-		temp[i] = arr[i];
+		temp[i] = data[i];
 	}
 
-	delete[] arr;
+	delete[] data;
 
-	arr = temp;
+	data = temp;
 }
 
 template <typename T>
-void stack<T>::push(T value)
+void Stack<T>::push(T t)
 {
-	if (top == capacity)
+	if (++top == capacity)
 	{
 		resize(true);
 	}
 
-	arr[top++] = value;
+	data[top] = t;
 }
 
 template <typename T>
-T stack<T>::pop()
+T Stack<T>::pop()
 {
-	if (top == 0) return NULL;
+	if (isEmpty()) throw -1;
 
-	if (--top == capacity / 4 && capacity != 8)
+	if (top == capacity / 4 && capacity != 8)
 	{
 		resize(false);
 	}
 
-	return arr[top];
+	return data[top--];
 }
 
 template <typename T>
-T stack<T>::peek() const
+T Stack<T>::peek() const
 {
-	if (top == 0) return NULL;
+	if (isEmpty()) throw -1;
 
-	return arr[top - 1];
+	return data[top];
+}
+
+template <typename T>
+inline bool Stack<T>::isEmpty() const
+{
+	return top == -1;
 }

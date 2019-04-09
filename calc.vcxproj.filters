@@ -20,7 +20,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stack.h">
+    <ClInclude Include="Calc.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Stack.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
   </ItemGroup>
